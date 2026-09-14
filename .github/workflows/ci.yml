@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate plugin and package skill
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SKILL.md frontmatter is Agent Skills spec-compatible
+        run: |
+          set -euo pipefail
+          f=skills/html-artifacts/SKILL.md
+          head -1 "$f" | grep -qx -- '---' || { echo "missing frontmatter"; exit 1; }
+          fm="$(awk 'NR>1 && $0=="---"{exit} NR>1{print}' "$f")"
+          echo "$fm" | grep -q '^name: html-artifacts$' || { echo "name must be html-artifacts"; exit 1; }
+          echo "$fm" | grep -q '^description:' || { echo "description required"; exit 1; }
+          desc_len=$(echo "$fm" | sed -n 's/^description: *//p' | wc -c)
+          echo "description length: $desc_len chars (limit 1536)"
+          [ "$desc_len" -le 1536 ] || exit 1
+          # Every reference file the skill points at must exist.
+          for ref in $(grep -o 'references/[a-z0-9-]*\.md' "$f" | sort -u); do
+            test -f "skills/html-artifacts/$ref" || { echo "missing $ref"; exit 1; }
+          done
+          # Every reference file must be indexed from SKILL.md.
+          for p in skills/html-artifacts/references/*.md; do
+            grep -q "references/$(basename "$p")" "$f" || { echo "$(basename "$p") is not referenced from SKILL.md"; exit 1; }
+          done
+
+      - name: Validate JSON manifests
+        run: |
+          for j in .claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+            python3 -m json.tool "$j" > /dev/null && echo "ok $j"
+          done
+          v1=$(python3 -c 'import json;print(json.load(open(".claude-plugin/plugin.json"))["version"])')
+          v2=$(python3 -c 'import json;print(json.load(open(".claude-plugin/marketplace.json"))["plugins"][0]["version"])')
+          [ "$v1" = "$v2" ] || { echo "plugin.json ($v1) and marketplace.json ($v2) versions differ"; exit 1; }
+
+      - name: Validate plugin with Claude Code
+        continue-on-error: true
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+
+      - name: Build the Claude.ai skill zip
+        run: scripts/build-skill.sh dist/html-artifacts.skill
+
+      - name: Check examples against the skill's universal rules
+        run: scripts/check-examples.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: html-artifacts.skill
+          path: dist/html-artifacts.skill

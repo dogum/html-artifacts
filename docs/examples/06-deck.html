@@ -1,4 +1,10 @@
 <!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Make a short deck on the case for HTML over markdown"
+  Single self-contained file. No build step, no network at view time.
+  Deliberately single-theme: decks project on dark rooms, so background and ink are painted explicitly.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -86,6 +92,8 @@ kbd {
 #s7 .meta { font: 300 3vmin/1.45 var(--serif); max-width: 28em; }
 #s7 .self { font: 600 2.5vmin var(--mono); color: var(--accent); margin-top: 1.5em; }
 
+:focus-visible { outline: 2px solid var(--accent, #8b5cf6); outline-offset: 2px; }
+@media print { @page { size: landscape; } .slide { display: flex; break-after: page; height: 100vh; } .counter, .hint { display: none; } }
 </style>
 </head>
 <body>
@@ -223,6 +231,12 @@ document.addEventListener('keydown', e => {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
   }
+});
+
+// Tap/click: right half advances, left half goes back (phones and tablets have no arrow keys).
+document.addEventListener('click', e => {
+  if (e.target.closest('a, button, input, label, select')) return;
+  go(e.clientX > innerWidth / 2 ? i + 1 : i - 1);
 });
 
 // Slide 6 interactivity
