@@ -1,4 +1,9 @@
 <!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Explain how a quarter-car model computes IRI from a road profile"
+  Single self-contained file. No build step, no network at view time.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -13,8 +18,9 @@
   --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --road:#aaaa9a; }
+  :root:not([data-theme="light"]) { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --road:#aaaa9a; }
 }
+:root[data-theme="dark"] { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --road:#aaaa9a; }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); margin: 0; }
 body { font: 17px/1.55 var(--serif); }
@@ -50,6 +56,7 @@ aside.glossary dt { font-weight: 600; color: var(--ink); margin-top: .9em; }
 aside.glossary dd { margin: .15em 0 0; }
 .legend { display: flex; gap: 1.2em; font: 12px var(--sans); color: var(--ink-soft); margin-bottom: .5em; }
 .legend .sw { display: inline-block; width: 12px; height: 12px; vertical-align: middle; margin-right: .35em; border-radius: 2px; }
+:focus-visible { outline: 2px solid var(--accent, #8b5cf6); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -74,7 +81,7 @@ aside.glossary dd { margin: .15em 0 0; }
       <line id="spoke" x1="200" y1="138" x2="200" y2="182" stroke="var(--ink)" stroke-width="1.5"/>
       <!-- Suspension (spring + damper) -->
       <path id="spring" d="" stroke="var(--accent)" stroke-width="2" fill="none"/>
-      <line id="damper" x1="" y1="" x2="" y2="" stroke="var(--accent)" stroke-width="2"/>
+      <line id="damper" x1="0" y1="0" x2="0" y2="0" stroke="var(--accent)" stroke-width="2"/>
       <!-- Body -->
       <rect id="body" x="160" y="60" width="80" height="38" rx="4" stroke="var(--ink)" stroke-width="2" fill="var(--surface)"/>
       <!-- Distance ticks at the bottom -->

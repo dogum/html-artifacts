@@ -1,0 +1,20 @@
+{
+  "name": "html-artifacts",
+  "description": "Marketplace for the html-artifacts skill: self-contained HTML artifacts instead of markdown, when it helps.",
+  "owner": { "name": "dogum", "url": "https://github.com/dogum" },
+  "plugins": [
+    {
+      "name": "html-artifacts",
+      "displayName": "HTML Artifacts",
+      "description": "Produce a self-contained HTML artifact instead of markdown when the content benefits from layout, color, diagrams, interactivity, or a round-trip editor. Knows when to stay in markdown.",
+      "source": "./",
+      "version": "2.0.0",
+      "author": { "name": "dogum", "url": "https://github.com/dogum" },
+      "homepage": "https://dogum.github.io/html-artifacts/",
+      "repository": "https://github.com/dogum/html-artifacts",
+      "license": "Apache-2.0",
+      "keywords": ["html", "artifacts", "documents", "diagrams", "editors", "reports", "decks"],
+      "category": "productivity"
+    }
+  ]
+}

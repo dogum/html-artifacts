@@ -283,11 +283,12 @@ section.meta blockquote cite {
 /* Install */
 section.install { padding: 4rem 0; }
 .install-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem;
   margin-top: 1.5rem;
 }
-@media (max-width: 720px) { .install-cards { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .install-cards { grid-template-columns: 1fr; } }
 .install-card {
+  min-width: 0;
   background: var(--surface); border: 1px solid var(--rule);
   border-radius: 4px; padding: 1.4rem 1.5rem;
 }
@@ -299,7 +300,7 @@ section.install { padding: 4rem 0; }
   background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
   padding: .8em 1em; margin: .8em 0 .3em;
   font: 12.5px/1.5 var(--mono); color: var(--ink);
-  overflow-x: auto;
+  overflow-x: auto; white-space: pre-wrap; word-break: break-word;
 }
 .install-card .time { font: 11px var(--mono); color: var(--ink-mute); margin-top: 1em; display: block; }
 
@@ -347,10 +348,10 @@ footer.foot .colophon code { font-size: .92em; }
   <div class="eyebrow">A Claude skill, by way of <a href="https://thariqs.github.io/html-effectiveness/">Thariq Shihipar's argument</a></div>
   <h1>Markdown is a poor format for the things <span class="headline-em">agents now make</span>.</h1>
   <p class="lead">Plans, comparisons, code reviews, status reports, throwaway editors — they read dramatically better as self-contained HTML than as markdown documents. This skill teaches Claude when to make an HTML artifact instead, and equally important, when to <em>leave well enough alone</em>.</p>
-  <p class="lead-small">Six artifacts below, each produced by the skill in response to a real prompt. This page is itself one of them.</p>
+  <p class="lead-small">Nine artifacts below, each produced by the skill in response to a real prompt, and each rendered headless and checked before it shipped. This page is itself one of them.</p>
 
   <div class="actions">
-    <a class="primary" href="https://github.com/dogum/html-artifacts/raw/main/html-artifacts.skill">Download <code>.skill</code> →</a>
+    <a class="primary" href="https://github.com/dogum/html-artifacts/releases/latest">Download <code>.skill</code> →</a>
     <a class="secondary" href="https://github.com/dogum/html-artifacts">github →</a>
   </div>
 </header>
@@ -399,7 +400,7 @@ footer.foot .colophon code { font-size: .92em; }
 <section class="examples" id="examples">
   <div class="head">
     <h2>Examples</h2>
-    <span class="cat">six artifacts · six categories</span>
+    <span class="cat">nine artifacts · nine categories</span>
   </div>
   <p class="intro">Each is a self-contained <code>.html</code> file. None has a build step; none calls a server at view time; each is the kind of artifact the skill produces on prompt. Open any of them directly.</p>
 
@@ -608,6 +609,53 @@ footer.foot .colophon code { font-size: .92em; }
       <span class="file">06-deck.html</span>
     </a>
 
+    <a class="card" href="examples/07-code-review.html">
+      <div class="fingerprint" aria-hidden="true">
+        <svg viewBox="0 0 220 56" preserveAspectRatio="none">
+          <g fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="6" width="140" height="44" rx="3"/><rect x="154" y="6" width="60" height="18" rx="3"/><rect x="154" y="30" width="60" height="18" rx="3"/></g>
+          <g fill="currentColor" opacity=".5"><rect x="14" y="14" width="80" height="2"/><rect x="14" y="20" width="110" height="2"/><rect x="14" y="26" width="60" height="2"/><rect x="14" y="32" width="96" height="2"/><rect x="14" y="38" width="70" height="2"/><rect x="14" y="44" width="40" height="2"/></g>
+          <g fill="currentColor" opacity=".9"><rect x="8" y="19" width="2" height="4"/><rect x="8" y="31" width="2" height="4"/></g>
+          <g fill="none" stroke="currentColor" stroke-width="1" opacity=".5"><line x1="146" y1="21" x2="154" y2="15"/><line x1="146" y1="33" x2="154" y2="39"/></g>
+        </svg>
+      </div>
+      <span class="num">07</span>
+      <span class="cat">Code review &amp; PR</span>
+      <h3>Review: retry with backoff in api-client</h3>
+      <p>The diff is the spine; six numbered notes sit in the margin, pinned to lines. Severity is worded as well as colored, jump links at the top, and a verdict that actually decides.</p>
+      <span class="file">07-code-review.html</span>
+    </a>
+
+    <a class="card" href="examples/08-design-tokens.html">
+      <div class="fingerprint" aria-hidden="true">
+        <svg viewBox="0 0 220 56" preserveAspectRatio="none">
+          <g fill="currentColor"><rect x="6" y="6" width="30" height="20" rx="2" opacity=".9"/><rect x="42" y="6" width="30" height="20" rx="2" opacity=".65"/><rect x="78" y="6" width="30" height="20" rx="2" opacity=".45"/><rect x="114" y="6" width="30" height="20" rx="2" opacity=".3"/><rect x="150" y="6" width="30" height="20" rx="2" opacity=".18"/></g>
+          <g fill="currentColor" opacity=".6"><rect x="6" y="36" width="60" height="6"/><rect x="6" y="46" width="40" height="4"/><rect x="72" y="38" width="100" height="2"/><rect x="72" y="46" width="70" height="2"/></g>
+        </svg>
+      </div>
+      <span class="num">08</span>
+      <span class="cat">Design &amp; prototypes</span>
+      <h3>Ledger design tokens</h3>
+      <p>Every token rendered as itself: swatches, a type scale at real size, spacing bars, radii, shadows, and easing curves you can hover to play. One-click copy of the value or the name.</p>
+      <span class="file">08-design-tokens.html</span>
+    </a>
+
+    <a class="card" href="examples/09-postmortem.html">
+      <div class="fingerprint" aria-hidden="true">
+        <svg viewBox="0 0 220 56" preserveAspectRatio="none">
+          <line x1="40" y1="4" x2="40" y2="52" stroke="currentColor" stroke-width="1.4" opacity=".4"/>
+          <g fill="currentColor"><circle cx="40" cy="10" r="3" opacity=".5"/><circle cx="40" cy="20" r="3"/><circle cx="40" cy="27" r="3"/><circle cx="40" cy="42" r="3" opacity=".5"/><circle cx="40" cy="50" r="3" opacity=".8"/></g>
+          <g fill="currentColor" opacity=".5"><rect x="8" y="9" width="24" height="2"/><rect x="8" y="19" width="24" height="2"/><rect x="8" y="26" width="24" height="2"/><rect x="8" y="41" width="24" height="2"/><rect x="8" y="49" width="24" height="2"/></g>
+          <g fill="currentColor" opacity=".5"><rect x="50" y="9" width="90" height="2"/><rect x="50" y="19" width="140" height="2"/><rect x="50" y="26" width="110" height="2"/><rect x="50" y="41" width="70" height="2"/><rect x="50" y="49" width="120" height="2"/></g>
+          <rect x="50" y="30" width="150" height="7" rx="1" fill="currentColor" opacity=".2"/>
+        </svg>
+      </div>
+      <span class="num">09</span>
+      <span class="cat">Reports &amp; research</span>
+      <h3>Post-mortem: search latency after api v2.31.0</h3>
+      <p>Impact summary first, then a drawn timeline with the pace visible: log excerpts at the moments that matter, a gap annotation where nothing happened, action items with owners. Prints cleanly.</p>
+      <span class="file">09-postmortem.html</span>
+    </a>
+
   </div>
 </section>
 
@@ -615,64 +663,78 @@ footer.foot .colophon code { font-size: .92em; }
 <section class="structure" id="whats-in-it">
   <div class="head">
     <h2>What's in the skill</h2>
-    <span class="cat">SKILL.md + 8 references</span>
+    <span class="cat">SKILL.md + 12 references</span>
   </div>
-  <p class="intro"><code>SKILL.md</code> is the entry point. It teaches recognition (when does a request want HTML?), the universal rules every artifact must follow, and the carve-outs. Each per-category reference is pulled in only when the task fits — most artifacts only need one or two.</p>
+  <p class="intro"><code>SKILL.md</code> is the entry point. It teaches recognition (when does a request want HTML?), the universal rules every artifact must follow, the carve-outs, and a five-step workflow that ends with verifying the page before handing it over. Each reference is pulled in only when the task fits; most artifacts need one or two. Eight are per-category patterns; four are cross-cutting: data and charts, accessibility and print, harness mechanics (the one file that knows which surface you're on), and the pre-delivery check.</p>
 
   <div class="hub-wrap">
-    <svg viewBox="0 0 760 360" role="img" aria-labelledby="hub-title" style="width:100%;height:auto">
-      <title id="hub-title">Skill structure: SKILL.md at the center, eight reference files as spokes</title>
-
-      <!-- spokes -->
+    <svg viewBox="-70 -20 900 420" role="img" aria-labelledby="hub-title" style="width:100%;height:auto">
+      <title id="hub-title">Skill structure: SKILL.md at the center, twelve reference files as spokes</title>
       <g fill="none" stroke="currentColor" stroke-width="1" opacity=".25" stroke-dasharray="3 3">
-        <line x1="380" y1="180" x2="160" y2="60"/>
-        <line x1="380" y1="180" x2="380" y2="40"/>
-        <line x1="380" y1="180" x2="600" y2="60"/>
-        <line x1="380" y1="180" x2="700" y2="180"/>
-        <line x1="380" y1="180" x2="600" y2="300"/>
-        <line x1="380" y1="180" x2="380" y2="320"/>
-        <line x1="380" y1="180" x2="160" y2="300"/>
-        <line x1="380" y1="180" x2="60"  y2="180"/>
+        <line x1="380" y1="190" x2="380" y2="40"/>
+        <line x1="380" y1="190" x2="545" y2="60"/>
+        <line x1="380" y1="190" x2="666" y2="115"/>
+        <line x1="380" y1="190" x2="710" y2="190"/>
+        <line x1="380" y1="190" x2="666" y2="265"/>
+        <line x1="380" y1="190" x2="545" y2="320"/>
+        <line x1="380" y1="190" x2="380" y2="340"/>
+        <line x1="380" y1="190" x2="215" y2="320"/>
+        <line x1="380" y1="190" x2="94" y2="265"/>
+        <line x1="380" y1="190" x2="50" y2="190"/>
+        <line x1="380" y1="190" x2="94" y2="115"/>
+        <line x1="380" y1="190" x2="215" y2="60"/>
       </g>
-
-      <!-- spoke labels (references) -->
-      <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="currentColor">
-        <g transform="translate(160, 60)">
-          <rect x="-92" y="-15" width="184" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">exploration-and-planning</text>
-        </g>
+      <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="currentColor">
         <g transform="translate(380, 40)">
-          <rect x="-78" y="-15" width="156" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">code-review-and-pr</text>
+          <rect x="-95" y="-14" width="190" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">exploration-and-planning</text>
         </g>
-        <g transform="translate(600, 60)">
-          <rect x="-86" y="-15" width="172" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">design-and-prototypes</text>
+        <g transform="translate(545, 60)">
+          <rect x="-74" y="-14" width="148" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">code-review-and-pr</text>
         </g>
-        <g transform="translate(700, 180)">
-          <rect x="-58" y="-15" width="116" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">diagrams</text>
+        <g transform="translate(666, 115)">
+          <rect x="-85" y="-14" width="169" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">design-and-prototypes</text>
         </g>
-        <g transform="translate(600, 300)">
-          <rect x="-90" y="-15" width="180" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">reports-and-research</text>
+        <g transform="translate(710, 190)">
+          <rect x="-102" y="-14" width="204" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">diagrams-and-illustrations</text>
         </g>
-        <g transform="translate(380, 320)">
-          <rect x="-44" y="-15" width="88" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">decks</text>
+        <g transform="translate(666, 265)">
+          <rect x="-64" y="-14" width="127" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">data-and-charts</text>
         </g>
-        <g transform="translate(160, 300)">
-          <rect x="-66" y="-15" width="132" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" y="5">custom-editors</text>
+        <g transform="translate(545, 320)">
+          <rect x="-81" y="-14" width="162" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">reports-and-research</text>
         </g>
-        <g transform="translate(60, 180)">
-          <rect x="-48" y="-15" width="180" height="30" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
-          <text text-anchor="middle" x="42" y="5">matching-your-style</text>
+        <g transform="translate(380, 340)">
+          <rect x="-29" y="-14" width="57" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">decks</text>
+        </g>
+        <g transform="translate(215, 320)">
+          <rect x="-60" y="-14" width="120" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">custom-editors</text>
+        </g>
+        <g transform="translate(94, 265)">
+          <rect x="-78" y="-14" width="155" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">matching-your-style</text>
+        </g>
+        <g transform="translate(50, 190)">
+          <rect x="-92" y="-14" width="183" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">accessibility-and-print</text>
+        </g>
+        <g transform="translate(94, 115)">
+          <rect x="-71" y="-14" width="141" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">harness-mechanics</text>
+        </g>
+        <g transform="translate(215, 60)">
+          <rect x="-95" y="-14" width="190" height="28" rx="4" fill="var(--surface)" stroke="var(--rule-strong)" stroke-width="1"/>
+          <text text-anchor="middle" y="4">verify-before-delivering</text>
         </g>
       </g>
-
-      <!-- center hub -->
-      <g transform="translate(380, 180)">
+      <g transform="translate(380, 190)">
         <circle r="58" fill="var(--accent)" opacity=".09"/>
         <circle r="48" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
         <text text-anchor="middle" y="-3" font-family="ui-monospace, monospace" font-size="13" font-weight="600" fill="var(--accent)">SKILL.md</text>
@@ -687,10 +749,14 @@ footer.foot .colophon code { font-size: .92em; }
     <li><code>references/code-review-and-pr</code></li>
     <li><code>references/design-and-prototypes</code></li>
     <li><code>references/diagrams-and-illustrations</code></li>
+    <li><code>references/data-and-charts</code></li>
     <li><code>references/reports-and-research</code></li>
     <li><code>references/decks</code></li>
     <li><code>references/custom-editors</code></li>
     <li><code>references/matching-your-style</code></li>
+    <li><code>references/accessibility-and-print</code></li>
+    <li><code>references/harness-mechanics</code></li>
+    <li><code>references/verify-before-delivering</code></li>
   </ul>
 
   <div class="hub-legend">
@@ -776,30 +842,42 @@ footer.foot .colophon code { font-size: .92em; }
 <section class="install" id="install">
   <div class="head">
     <h2>Install</h2>
-    <span class="cat">claude.ai · Claude Code</span>
+    <span class="cat">Claude Code · Claude.ai · anywhere skills load</span>
   </div>
 
   <div class="install-cards">
     <div class="install-card">
-      <div class="target">Claude.ai</div>
-      <h3>Upload the .skill file</h3>
+      <div class="target">Claude Code · recommended</div>
+      <h3>Install from the marketplace</h3>
       <ol>
-        <li>Download <a href="https://github.com/dogum/html-artifacts/raw/main/html-artifacts.skill"><code>html-artifacts.skill</code></a> from the repo.</li>
-        <li>In Claude.ai, go to <em>Settings → Capabilities → Skills</em>.</li>
-        <li>Upload the <code>.skill</code> file.</li>
+        <li>Add this repo as a marketplace.</li>
+        <li>Install the plugin. Updates arrive with <code>/plugin update</code>.</li>
       </ol>
-      <span class="time">~30 seconds · available in any new conversation</span>
+<pre>/plugin marketplace add dogum/html-artifacts
+/plugin install html-artifacts@html-artifacts</pre>
+      <span class="time">~20 seconds · auto-updatable</span>
     </div>
 
     <div class="install-card">
-      <div class="target">Claude Code</div>
-      <h3>Drop the folder into ~/.claude/skills/</h3>
+      <div class="target">Claude.ai · Cowork · cloud</div>
+      <h3>Upload the .skill file</h3>
+      <ol>
+        <li>Download <a href="https://github.com/dogum/html-artifacts/releases/latest"><code>html-artifacts.skill</code></a> from the latest release.</li>
+        <li>In Claude.ai, go to <em>Settings → Capabilities → Skills</em>.</li>
+        <li>Upload the <code>.skill</code> file.</li>
+      </ol>
+      <span class="time">~30 seconds · re-upload to update</span>
+    </div>
+
+    <div class="install-card">
+      <div class="target">Manual</div>
+      <h3>Copy the folder</h3>
       <ol>
         <li>Clone the repo.</li>
-        <li>Copy <code>skill/</code> into your skills directory.</li>
+        <li>Copy <code>skills/html-artifacts/</code> into your skills directory. Any Agent Skills-compatible runtime works.</li>
       </ol>
 <pre>git clone https://github.com/dogum/html-artifacts.git
-cp -r html-artifacts/skill ~/.claude/skills/html-artifacts</pre>
+cp -r html-artifacts/skills/html-artifacts ~/.claude/skills/</pre>
       <span class="time">~30 seconds</span>
     </div>
   </div>
@@ -819,13 +897,14 @@ cp -r html-artifacts/skill ~/.claude/skills/html-artifacts</pre>
       <h3>Links</h3>
       <ul>
         <li><a href="https://github.com/dogum/html-artifacts">GitHub repo</a></li>
-        <li><a href="https://github.com/dogum/html-artifacts/raw/main/html-artifacts.skill">Download <code>.skill</code></a></li>
+        <li><a href="https://github.com/dogum/html-artifacts/releases/latest">Latest release (<code>.skill</code> download)</a></li>
+        <li><a href="https://github.com/dogum/html-artifacts/blob/main/CHANGELOG.md">Changelog</a></li>
         <li><a href="https://thariqs.github.io/html-effectiveness/">Thariq's companion site</a></li>
         <li><a href="https://github.com/anthropics/skills">Anthropic's skills repo</a></li>
       </ul>
     </div>
     <div class="colophon">
-      Apache 2.0 · Charter / Inter / IBM Plex Mono · No build step. No tracking. Single <code>index.html</code> + 6 example files. <a href="https://github.com/dogum/html-artifacts/blob/main/docs/index.html">View source →</a>
+      Apache 2.0 · Charter / Inter / IBM Plex Mono · No build step. No tracking. Single <code>index.html</code> + 9 example files. <a href="https://github.com/dogum/html-artifacts/blob/main/docs/index.html">View source →</a>
     </div>
   </div>
 </footer>

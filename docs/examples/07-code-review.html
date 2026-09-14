@@ -1,0 +1,213 @@
+<!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Review this PR: add retry with backoff to the API client"
+  Single self-contained file. No build step, no network at view time.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Review: retry with backoff in api-client</title>
+<style>
+:root {
+  --bg: #fafaf7; --surface: #fff; --ink: #1a1a1f; --ink-soft: #555560; --rule: #e7e5df;
+  --accent: #8b5cf6;
+  --add-bg: #e6f4ea; --add-ink: #14532d; --del-bg: #fdeaea; --del-ink: #7f1d1d;
+  --blocking: #b91c1c; --nit: #b45309; --question: #1d4ed8; --praise: #15803d;
+  --serif: Charter, "Iowan Old Style", "Source Serif 4", ui-serif, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --accent:#a78bfa;
+    --add-bg:#12331c; --add-ink:#bbf7d0; --del-bg:#3b1414; --del-ink:#fecaca;
+    --blocking:#f87171; --nit:#fbbf24; --question:#93c5fd; --praise:#4ade80;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --accent:#a78bfa;
+  --add-bg:#12331c; --add-ink:#bbf7d0; --del-bg:#3b1414; --del-ink:#fecaca;
+  --blocking:#f87171; --nit:#fbbf24; --question:#93c5fd; --praise:#4ade80;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.55 var(--serif); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 2.5rem auto; padding: 0 1.25rem; }
+header h1 { font-size: 1.7rem; margin: 0 0 .2em; letter-spacing: -.01em; }
+header .meta { font: 13px/1.5 var(--sans); color: var(--ink-soft); }
+header .meta code { font: 12px var(--mono); }
+.framing { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin: 1.5rem 0 2rem; }
+.framing > div { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1rem 1.25rem; }
+.framing h2 { font: 600 12px/1 var(--sans); text-transform: uppercase; letter-spacing: .1em; margin: 0 0 .7em; color: var(--ink-soft); }
+.framing p, .framing li { margin: 0; font-size: 15px; }
+.framing ol { padding-left: 1.2em; margin: 0; }
+nav.jump { font: 13px var(--sans); display: flex; flex-wrap: wrap; gap: .4em .9em; margin-bottom: 1.5rem; align-items: center; }
+nav.jump a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+nav.jump a:hover { border-bottom-color: var(--accent); }
+.sev { display: inline-block; font: 600 11px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; padding: 3px 6px; border-radius: 3px; border: 1px solid currentColor; }
+.sev.blocking { color: var(--blocking); } .sev.nit { color: var(--nit); }
+.sev.question { color: var(--question); } .sev.praise { color: var(--praise); }
+details.file { border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); margin-bottom: 1.5rem; }
+details.file > summary { cursor: pointer; padding: .7rem 1rem; font: 500 13px var(--mono); display: flex; justify-content: space-between; gap: 1em; }
+details.file > summary .stat { color: var(--ink-soft); font-family: var(--sans); }
+details.file > summary .stat b { color: var(--add-ink); } details.file > summary .stat i { color: var(--del-ink); font-style: normal; }
+.diff { display: grid; grid-template-columns: minmax(0, 1fr) 300px; border-top: 1px solid var(--rule); }
+.code { overflow-x: auto; font: 12.5px/1.6 var(--mono); padding: .5rem 0; }
+.line { display: grid; grid-template-columns: 3ch 3ch 1ch 1fr; padding: 0 .75rem; white-space: pre; }
+.line .n { color: var(--ink-soft); text-align: right; padding-right: .5ch; user-select: none; opacity: .6; }
+.line.add { background: var(--add-bg); color: var(--add-ink); } .line.del { background: var(--del-bg); color: var(--del-ink); }
+.line.hunk { color: var(--ink-soft); background: color-mix(in srgb, var(--rule) 40%, transparent); }
+.line.noted { box-shadow: inset 3px 0 0 var(--accent); }
+.line .ref { position: relative; }
+.line .ref::after { content: attr(data-note); position: absolute; right: .25rem; top: 0; font: 600 10px/1.6 var(--sans); color: var(--accent); }
+.notes { border-left: 1px solid var(--rule); padding: .75rem; font: 14px/1.45 var(--sans); display: flex; flex-direction: column; gap: .8rem; }
+.note { border: 1px solid var(--rule); border-radius: 4px; padding: .6rem .75rem; background: var(--bg); }
+.note .k { font: 600 11px/1 var(--mono); color: var(--accent); margin-right: .5em; }
+.note p { margin: .4em 0 0; }
+.note code { font: 12px var(--mono); background: var(--surface); padding: 1px 4px; border-radius: 3px; }
+.note:target { outline: 2px solid var(--accent); }
+.verdict { margin-top: 2rem; padding: 1rem 1.25rem; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 3px; }
+.verdict h2 { margin: 0 0 .4em; font-size: 1.15rem; }
+.verdict ul { margin: .4em 0 0; padding-left: 1.2em; }
+@media (max-width: 800px) {
+  .framing { grid-template-columns: 1fr; }
+  .diff { grid-template-columns: 1fr; }
+  .notes { border-left: 0; border-top: 1px solid var(--rule); }
+}
+@media print {
+  :root { --bg:#fff; --surface:#fff; --ink:#000; --ink-soft:#333; --rule:#bbb; }
+  nav.jump { display: none; }
+  details.file > summary { list-style: none; }
+  .diff { grid-template-columns: 1fr; }
+  .code { overflow: visible; }
+  .line { white-space: pre-wrap; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Add retry with backoff to <code>api-client</code></h1>
+  <div class="meta">PR #482 · <code>feat/client-retry</code> → <code>main</code> · 2 files · +58 −9 · reviewing for correctness and failure behaviour</div>
+</header>
+
+<div class="framing">
+  <div>
+    <h2>Motivation</h2>
+    <p>Payments calls fail transiently under load (about 0.4% of requests, mostly 503s from the gateway). Today every failure surfaces to the caller. This PR wraps <code>request()</code> in a retry loop with exponential backoff and jitter, opt-in per call.</p>
+  </div>
+  <div>
+    <h2>Where to focus</h2>
+    <ol>
+      <li>Which errors are retried (note 2).</li>
+      <li>The idempotency guard (note 3).</li>
+      <li>Timeout budget across attempts (note 4).</li>
+    </ol>
+  </div>
+</div>
+
+<nav class="jump" aria-label="Jump to notes">
+  <span class="sev blocking">blocking</span> <a href="#n2">2</a> <a href="#n3">3</a>
+  <span class="sev question">question</span> <a href="#n4">4</a>
+  <span class="sev nit">nit</span> <a href="#n1">1</a> <a href="#n5">5</a>
+  <span class="sev praise">praise</span> <a href="#n6">6</a>
+</nav>
+
+<details class="file" open>
+  <summary><span>src/client/retry.ts</span><span class="stat">new file · <b>+41</b></span></summary>
+  <div class="diff">
+    <div class="code" role="region" aria-label="Diff of src/client/retry.ts">
+<div class="line hunk"><span class="n"></span><span class="n"></span><span></span><span>@@ -0,0 +1,41 @@</span></div>
+<div class="line add"><span class="n"></span><span class="n">1</span><span>+</span><span>export interface RetryOptions {</span></div>
+<div class="line add"><span class="n"></span><span class="n">2</span><span>+</span><span>  attempts?: number;      // total attempts, default 3</span></div>
+<div class="line add"><span class="n"></span><span class="n">3</span><span>+</span><span>  baseMs?: number;        // first delay, default 200</span></div>
+<div class="line add"><span class="n"></span><span class="n">4</span><span>+</span><span>  maxMs?: number;         // cap, default 2000</span></div>
+<div class="line add noted"><span class="n"></span><span class="n">5</span><span>+</span><span class="ref" data-note="1">  retryOn?: (err: unknown) => boolean;</span></div>
+<div class="line add"><span class="n"></span><span class="n">6</span><span>+</span><span>}</span></div>
+<div class="line add"><span class="n"></span><span class="n">7</span><span>+</span><span></span></div>
+<div class="line add noted"><span class="n"></span><span class="n">8</span><span>+</span><span class="ref" data-note="2">const defaultRetryOn = (err: unknown) => true;</span></div>
+<div class="line add"><span class="n"></span><span class="n">9</span><span>+</span><span></span></div>
+<div class="line add"><span class="n"></span><span class="n">10</span><span>+</span><span>export async function withRetry&lt;T&gt;(</span></div>
+<div class="line add"><span class="n"></span><span class="n">11</span><span>+</span><span>  fn: () => Promise&lt;T&gt;,</span></div>
+<div class="line add"><span class="n"></span><span class="n">12</span><span>+</span><span>  opts: RetryOptions = {},</span></div>
+<div class="line add"><span class="n"></span><span class="n">13</span><span>+</span><span>): Promise&lt;T&gt; {</span></div>
+<div class="line add"><span class="n"></span><span class="n">14</span><span>+</span><span>  const attempts = opts.attempts ?? 3;</span></div>
+<div class="line add"><span class="n"></span><span class="n">15</span><span>+</span><span>  const base = opts.baseMs ?? 200;</span></div>
+<div class="line add"><span class="n"></span><span class="n">16</span><span>+</span><span>  const max = opts.maxMs ?? 2000;</span></div>
+<div class="line add"><span class="n"></span><span class="n">17</span><span>+</span><span>  const retryOn = opts.retryOn ?? defaultRetryOn;</span></div>
+<div class="line add"><span class="n"></span><span class="n">18</span><span>+</span><span>  let lastErr: unknown;</span></div>
+<div class="line add"><span class="n"></span><span class="n">19</span><span>+</span><span>  for (let i = 0; i &lt; attempts; i++) {</span></div>
+<div class="line add"><span class="n"></span><span class="n">20</span><span>+</span><span>    try {</span></div>
+<div class="line add"><span class="n"></span><span class="n">21</span><span>+</span><span>      return await fn();</span></div>
+<div class="line add"><span class="n"></span><span class="n">22</span><span>+</span><span>    } catch (err) {</span></div>
+<div class="line add"><span class="n"></span><span class="n">23</span><span>+</span><span>      lastErr = err;</span></div>
+<div class="line add"><span class="n"></span><span class="n">24</span><span>+</span><span>      if (i === attempts - 1 || !retryOn(err)) break;</span></div>
+<div class="line add noted"><span class="n"></span><span class="n">25</span><span>+</span><span class="ref" data-note="6">      const delay = Math.min(max, base * 2 ** i) * (0.5 + Math.random());</span></div>
+<div class="line add"><span class="n"></span><span class="n">26</span><span>+</span><span>      await new Promise(r => setTimeout(r, delay));</span></div>
+<div class="line add"><span class="n"></span><span class="n">27</span><span>+</span><span>    }</span></div>
+<div class="line add"><span class="n"></span><span class="n">28</span><span>+</span><span>  }</span></div>
+<div class="line add"><span class="n"></span><span class="n">29</span><span>+</span><span>  throw lastErr;</span></div>
+<div class="line add"><span class="n"></span><span class="n">30</span><span>+</span><span>}</span></div>
+    </div>
+    <aside class="notes" aria-label="Review notes for retry.ts">
+      <div class="note" id="n1"><span class="k">1</span><span class="sev nit">nit</span><p><code>retryOn</code> receives <code>unknown</code>, so every caller has to narrow. Consider typing it as <code>(err: ApiError | Error) =&gt; boolean</code> since <code>request()</code> only throws those.</p></div>
+      <div class="note" id="n2"><span class="k">2</span><span class="sev blocking">blocking</span><p>Default retries <em>everything</em>, including 400s, auth failures, and JSON parse errors. A 401 will be retried three times with backoff and then fail anyway, and a 409 on a payment will be retried into a duplicate. Default should be: network errors, 408, 429, 502, 503, 504. Make callers opt in to anything wider.</p></div>
+      <div class="note" id="n6"><span class="k">6</span><span class="sev praise">praise</span><p>Full jitter (0.5 to 1.5× the delay) rather than fixed steps. This is the version that actually spreads retries out under a thundering herd.</p></div>
+    </aside>
+  </div>
+</details>
+
+<details class="file" open>
+  <summary><span>src/client/request.ts</span><span class="stat"><b>+17</b> <i>−9</i></span></summary>
+  <div class="diff">
+    <div class="code" role="region" aria-label="Diff of src/client/request.ts">
+<div class="line hunk"><span class="n"></span><span class="n"></span><span></span><span>@@ -1,6 +1,7 @@</span></div>
+<div class="line"><span class="n">1</span><span class="n">1</span><span> </span><span>import { ApiError } from './errors';</span></div>
+<div class="line add"><span class="n"></span><span class="n">2</span><span>+</span><span>import { withRetry, type RetryOptions } from './retry';</span></div>
+<div class="line"><span class="n">2</span><span class="n">3</span><span> </span><span></span></div>
+<div class="line del"><span class="n">3</span><span class="n"></span><span>-</span><span>export async function request&lt;T&gt;(path: string, init: RequestInit = {}): Promise&lt;T&gt; {</span></div>
+<div class="line add"><span class="n"></span><span class="n">4</span><span>+</span><span>export interface RequestOptions extends RequestInit { retry?: RetryOptions | false; timeoutMs?: number }</span></div>
+<div class="line add"><span class="n"></span><span class="n">5</span><span>+</span><span></span></div>
+<div class="line add noted"><span class="n"></span><span class="n">6</span><span>+</span><span class="ref" data-note="3">export async function request&lt;T&gt;(path: string, init: RequestOptions = {}): Promise&lt;T&gt; {</span></div>
+<div class="line hunk"><span class="n"></span><span class="n"></span><span></span><span>@@ -12,9 +13,17 @@</span></div>
+<div class="line del"><span class="n">12</span><span class="n"></span><span>-</span><span>  const ctrl = new AbortController();</span></div>
+<div class="line del"><span class="n">13</span><span class="n"></span><span>-</span><span>  const t = setTimeout(() => ctrl.abort(), 8000);</span></div>
+<div class="line del"><span class="n">14</span><span class="n"></span><span>-</span><span>  const res = await fetch(base + path, { ...init, signal: ctrl.signal });</span></div>
+<div class="line del"><span class="n">15</span><span class="n"></span><span>-</span><span>  clearTimeout(t);</span></div>
+<div class="line del"><span class="n">16</span><span class="n"></span><span>-</span><span>  if (!res.ok) throw new ApiError(res.status, await res.text());</span></div>
+<div class="line del"><span class="n">17</span><span class="n"></span><span>-</span><span>  return res.json();</span></div>
+<div class="line add"><span class="n"></span><span class="n">13</span><span>+</span><span>  const { retry, timeoutMs = 8000, ...rest } = init;</span></div>
+<div class="line add"><span class="n"></span><span class="n">14</span><span>+</span><span>  const once = async () =&gt; {</span></div>
+<div class="line add"><span class="n"></span><span class="n">15</span><span>+</span><span>    const ctrl = new AbortController();</span></div>
+<div class="line add noted"><span class="n"></span><span class="n">16</span><span>+</span><span class="ref" data-note="4">    const t = setTimeout(() =&gt; ctrl.abort(), timeoutMs);</span></div>
+<div class="line add"><span class="n"></span><span class="n">17</span><span>+</span><span>    try {</span></div>
+<div class="line add"><span class="n"></span><span class="n">18</span><span>+</span><span>      const res = await fetch(base + path, { ...rest, signal: ctrl.signal });</span></div>
+<div class="line add"><span class="n"></span><span class="n">19</span><span>+</span><span>      if (!res.ok) throw new ApiError(res.status, await res.text());</span></div>
+<div class="line add"><span class="n"></span><span class="n">20</span><span>+</span><span>      return (await res.json()) as T;</span></div>
+<div class="line add"><span class="n"></span><span class="n">21</span><span>+</span><span>    } finally { clearTimeout(t); }</span></div>
+<div class="line add"><span class="n"></span><span class="n">22</span><span>+</span><span>  };</span></div>
+<div class="line add noted"><span class="n"></span><span class="n">23</span><span>+</span><span class="ref" data-note="5">  return retry === false ? once() : withRetry(once, retry ?? {});</span></div>
+<div class="line"><span class="n">18</span><span class="n">24</span><span> </span><span>}</span></div>
+    </div>
+    <aside class="notes" aria-label="Review notes for request.ts">
+      <div class="note" id="n3"><span class="k">3</span><span class="sev blocking">blocking</span><p>Retry is on by default for every method. A <code>POST /charges</code> that times out after the server committed will be re-sent. Either default <code>retry</code> to <code>false</code> for non-idempotent methods, or require an <code>Idempotency-Key</code> header before retrying a POST. The payments service is the stated motivation, so this is the case that matters.</p></div>
+      <div class="note" id="n4"><span class="k">4</span><span class="sev question">question</span><p>The 8 s timeout is per attempt, so three attempts plus backoff can take about 27 s. Is that intended? The gateway's own upstream timeout is 30 s, which leaves almost no margin. A total budget (<code>deadlineMs</code>) that shrinks the per-attempt timeout would be safer.</p></div>
+      <div class="note" id="n5"><span class="k">5</span><span class="sev nit">nit</span><p><code>retry ?? {}</code> means "undefined and null both retry with defaults." Fine, but say so in the <code>RequestOptions</code> doc comment; the <code>| false</code> union makes it look like the only way to opt out.</p></div>
+    </aside>
+  </div>
+</details>
+
+<section class="verdict">
+  <h2>Verdict: request changes</h2>
+  <p>The mechanics are right (jitter, cap, cleanup in <code>finally</code>). The policy is wrong: retrying everything by default, including non-idempotent writes, is the one thing this change must not do on a payments path. Two changes and this is good to merge:</p>
+  <ul>
+    <li>Narrow the default <code>retryOn</code> to network errors and 408/429/502/503/504.</li>
+    <li>Default <code>retry</code> to off for POST/PATCH/DELETE unless an idempotency key is present.</li>
+  </ul>
+</section>
+</div>
+</body>
+</html>

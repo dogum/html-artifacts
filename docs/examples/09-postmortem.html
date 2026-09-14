@@ -1,0 +1,165 @@
+<!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Write up yesterday's search latency outage as a post-mortem I can send to the team"
+  Single self-contained file. No build step, no network at view time.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Post-mortem: search latency, 2026-09-11</title>
+<style>
+:root {
+  --bg: #fafaf7; --surface: #fff; --ink: #1a1a1f; --ink-soft: #555560; --rule: #e7e5df; --accent: #8b5cf6;
+  --sev: #b91c1c; --ok: #15803d; --warn: #b45309;
+  --log-bg: #16161c; --log-ink: #d4d4dc; --log-warn: #fbbf24; --log-err: #f87171;
+  --serif: Charter, "Iowan Old Style", "Source Serif 4", ui-serif, Georgia, serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --accent:#a78bfa; --sev:#f87171; --ok:#4ade80; --warn:#fbbf24; --log-bg:#0a0a0e; }
+}
+:root[data-theme="dark"] { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --accent:#a78bfa; --sev:#f87171; --ok:#4ade80; --warn:#fbbf24; --log-bg:#0a0a0e; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 17px/1.55 var(--serif); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 78ch; margin: 3rem auto; padding: 0 1.25rem; }
+header h1 { font-size: 1.9rem; line-height: 1.15; margin: 0 0 .3em; letter-spacing: -.01em; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .75rem; margin: 1.25rem 0; }
+.fact { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: .6rem .8rem; }
+.fact b { display: block; font: 600 11px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); margin-bottom: .4em; }
+.fact span { font: 500 15px var(--sans); }
+.fact .sev { color: var(--sev); }
+.impact { border-left: 3px solid var(--sev); padding: .6rem 1rem; background: var(--surface); margin: 1.5rem 0; }
+.impact p { margin: 0; }
+h2 { font-size: 1.3rem; margin: 2.4em 0 .6em; }
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; font-family: var(--sans); font-size: 15px; }
+.timeline::before { content: ""; position: absolute; left: 88px; top: 6px; bottom: 6px; width: 2px; background: var(--rule); }
+.timeline li { display: grid; grid-template-columns: 72px 32px 1fr; gap: 0; align-items: start; padding: .35rem 0; }
+.timeline .t { font: 500 13px var(--mono); color: var(--ink-soft); text-align: right; padding-top: 3px; }
+.timeline .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink-soft); margin: 4px 0 0 10px; }
+.timeline li.bad .dot { border-color: var(--sev); background: var(--sev); }
+.timeline li.good .dot { border-color: var(--ok); background: var(--ok); }
+.timeline li.gap { padding: 0; }
+.timeline li.gap .gapline { grid-column: 3; font: 12px var(--sans); color: var(--ink-soft); padding: .4rem 0 .4rem .2rem; font-style: italic; }
+.timeline .e { padding-left: .5rem; min-width: 0; }
+.timeline .e b { font-weight: 600; }
+pre.log { background: var(--log-bg); color: var(--log-ink); font: 12px/1.5 var(--mono); padding: .7rem .9rem; border-radius: 4px; overflow-x: auto; margin: .5rem 0 .3rem; }
+pre.log .w { color: var(--log-warn); } pre.log .er { color: var(--log-err); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.two > div { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: .9rem 1.1rem; }
+.two h3 { margin: 0 0 .5em; font-size: 1rem; }
+.two h3.good { color: var(--ok); } .two h3.bad { color: var(--warn); }
+.two ul { margin: 0; padding-left: 1.1em; font-size: 15px; }
+table.actions { width: 100%; border-collapse: collapse; font: 15px var(--sans); background: var(--surface); border: 1px solid var(--rule); }
+table.actions th, table.actions td { text-align: left; padding: .55rem .75rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.actions th { font: 600 11px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+table.actions td.owner { white-space: nowrap; font-weight: 500; }
+table.actions td.due { white-space: nowrap; color: var(--ink-soft); }
+details { border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); padding: .5rem .9rem; margin: 1rem 0; }
+summary { cursor: pointer; font: 500 14px var(--sans); }
+footer { margin-top: 3rem; font: 13px var(--sans); color: var(--ink-soft); border-top: 1px solid var(--rule); padding-top: 1rem; }
+@media (max-width: 640px) {
+  .two { grid-template-columns: 1fr; }
+  .timeline::before { left: 62px; }
+  .timeline li { grid-template-columns: 48px 30px 1fr; }
+  .timeline .t { font-size: 12px; }
+}
+@media print {
+  :root { --bg:#fff; --surface:#fff; --ink:#000; --ink-soft:#333; --rule:#bbb; --log-bg:#f3f3f3; --log-ink:#000; --log-warn:#7a4a00; --log-err:#900; }
+  body { font-size: 11pt; }
+  .wrap { max-width: none; margin: 0; }
+  .timeline::before { background: #999; }
+  pre, table, .two > div, .impact { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  details > summary { list-style: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Search latency degradation after api v2.31.0</h1>
+  <div class="facts">
+    <div class="fact"><b>Date</b><span>2026-09-11</span></div>
+    <div class="fact"><b>Severity</b><span class="sev">SEV-2</span></div>
+    <div class="fact"><b>Duration</b><span>23 min (14:06–14:29 UTC)</span></div>
+    <div class="fact"><b>Detected by</b><span>Latency SLO pager</span></div>
+    <div class="fact"><b>Incident lead</b><span>Maya</span></div>
+  </div>
+</header>
+
+<div class="impact">
+  <p><strong>Customer impact.</strong> Search was slow or timed out for roughly <strong>8% of active sessions</strong> during the 23-minute window; p95 latency on <code>/search</code> rose from 180 ms to 2.4 s. No data was lost and no other endpoint was affected. The fix was a rollback; the root cause is understood and the permanent fix is scheduled below.</p>
+</div>
+
+<h2>Timeline <small style="font:13px var(--sans);color:var(--ink-soft)">all times UTC</small></h2>
+<ol class="timeline">
+  <li><span class="t">14:02</span><span class="dot"></span><span class="e"><b>Deploy</b> of api v2.31.0 completes across all regions. Canary passed (error rate only).</span></li>
+  <li class="bad"><span class="t">14:06</span><span class="dot"></span><span class="e"><b>p95 on /search climbs</b> from 180 ms to 2.4 s within two minutes.
+<pre class="log"><span class="w">14:06:12 WARN</span>  search-api  p95=1840ms  window=60s  replica=search-ro-2
+<span class="w">14:06:42 WARN</span>  search-api  p95=2410ms  window=60s  replica=search-ro-1
+<span class="er">14:07:05 ERROR</span> search-api  upstream timeout after 2000ms  route=/search  n=41</pre></span></li>
+  <li class="bad"><span class="t">14:09</span><span class="dot"></span><span class="e"><b>Pager fires</b> for the search latency SLO (5-minute burn rate).</span></li>
+  <li><span class="t">14:12</span><span class="dot"></span><span class="e">Maya acknowledges, opens the incident channel, pulls in Tomas.</span></li>
+  <li class="gap"><span></span><span></span><span class="gapline">6 minutes: dashboards showed CPU flat, connections normal. Nothing obvious.</span></li>
+  <li><span class="t">14:18</span><span class="dot"></span><span class="e"><b>Suspect identified.</b> Release notes for v2.31.0 include a migration that sets <code>jit = on</code> for the search read replicas. Query plans on <code>search-ro-1</code> confirm JIT compilation on the hot query.
+<pre class="log">search-ro-1=# EXPLAIN (ANALYZE) SELECT ... FROM documents WHERE tsv @@ $1 ...
+ JIT:
+   Functions: 14
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   <span class="w">Timing: Generation 2.1 ms, Inlining 38.4 ms, Optimization 214.9 ms, Emission 96.2 ms, Total 351.6 ms</span></pre></span></li>
+  <li><span class="t">14:25</span><span class="dot"></span><span class="e"><b>Rollback</b> to v2.30.4 started. Migration reverted on both replicas.</span></li>
+  <li class="good"><span class="t">14:29</span><span class="dot"></span><span class="e"><b>Recovered.</b> p95 back to 190 ms. Pager clears at 14:34 after the burn-rate window.</span></li>
+</ol>
+
+<h2>Root cause</h2>
+<p>The v2.31.0 migration enabled PostgreSQL's JIT compiler on the search read replicas, intending to speed up analytical queries on the same hosts. The planner also applied JIT to the search hot path: a full-text query that runs about 400 times per second. JIT compilation costs roughly 350 ms per plan, and because the query's parameters vary, plans were not being reused. Every search paid the compilation cost.</p>
+<p>The canary did not catch it because the canary gate checks error rate, not latency, and the requests were succeeding, just slowly, until the upstream timeout started tripping.</p>
+
+<h2>What worked and what didn't</h2>
+<div class="two">
+  <div>
+    <h3 class="good">What worked</h3>
+    <ul>
+      <li>SLO-based paging fired three minutes after onset, without a manual threshold.</li>
+      <li>Rollback was a single command and took four minutes.</li>
+      <li>Release notes listed the config change, which is what led to the diagnosis.</li>
+    </ul>
+  </div>
+  <div>
+    <h3 class="bad">What didn't</h3>
+    <ul>
+      <li>Six minutes were spent on host metrics before anyone read the release notes.</li>
+      <li>The canary gate is blind to latency regressions.</li>
+      <li>Database config changes ride along in app migrations, so they get app-level review, not DBA review.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Action items</h2>
+<table class="actions">
+  <thead><tr><th scope="col">Action</th><th scope="col">Owner</th><th scope="col">Due</th></tr></thead>
+  <tbody>
+    <tr><td>Pin <code>jit = off</code> in the read-replica config; move the setting out of app migrations.</td><td class="owner">Maya</td><td class="due">Fri 2026-09-18</td></tr>
+    <tr><td>Add a p95 latency check to the deploy canary gate, per route.</td><td class="owner">Tomas</td><td class="due">Next sprint</td></tr>
+    <tr><td>Write down the rollback procedure used here as a runbook.</td><td class="owner">Priya</td><td class="due">This week</td></tr>
+    <tr><td>Add "read the release notes first" to the incident-lead checklist.</td><td class="owner">Maya</td><td class="due">This week</td></tr>
+  </tbody>
+</table>
+
+<details>
+  <summary>Appendix: why JIT hurt here and not on the analytics replicas</summary>
+  <p>The planner enables JIT when the estimated query cost exceeds <code>jit_above_cost</code> (default 100 000). The search query's cost estimate sits just above that line because of the GIN index scan estimate, so it qualifies, but it runs in under 5 ms without JIT. Analytical queries run for seconds and amortise the compile. The right fix is per-role or per-replica, not global.</p>
+</details>
+
+<footer>Written by Maya, reviewed by Tomas and Priya · questions to #incidents · this document is blameless by design</footer>
+</div>
+<script>
+addEventListener('beforeprint', () => document.querySelectorAll('details').forEach(d => d.open = true));
+</script>
+</body>
+</html>

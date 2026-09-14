@@ -1,4 +1,9 @@
 <!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Diagram our deploy pipeline with happy path and failure paths"
+  Single self-contained file. No build step, no network at view time.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -14,8 +19,9 @@
   --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --neutral:#a8a8b3; }
+  :root:not([data-theme="light"]) { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --neutral:#a8a8b3; }
 }
+:root[data-theme="dark"] { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; --neutral:#a8a8b3; }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); margin: 0; }
 body { font: 16px/1.55 var(--serif); }
@@ -47,6 +53,7 @@ aside.detail h4 { font: 600 11px var(--sans); text-transform: uppercase; letter-
 aside.detail p, aside.detail li { font-size: 14px; line-height: 1.5; margin: .3em 0; }
 aside.detail code { font: 12px var(--mono); padding: 0 .2em; background: var(--bg); border-radius: 2px; }
 aside.detail .tip { font-size: 13px; color: var(--ink-soft); font-style: italic; }
+:focus-visible { outline: 2px solid var(--accent, #8b5cf6); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -264,7 +271,12 @@ function selectNode(name) {
 }
 
 document.querySelectorAll('[data-step]').forEach(node => {
+  node.setAttribute('tabindex', '0');
+  node.setAttribute('role', 'button');
   node.addEventListener('click', () => selectNode(node.dataset.step));
+  node.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectNode(node.dataset.step); }
+  });
 });
 </script>
 </body>

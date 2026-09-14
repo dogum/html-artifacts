@@ -6,3 +6,8 @@ Thumbs.db
 .idea/
 __pycache__/
 *.pyc
+
+# build output
+dist/
+# eval run output
+evals/results/

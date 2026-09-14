@@ -1,4 +1,9 @@
 <!doctype html>
+<!--
+  Produced by the html-artifacts skill (https://github.com/dogum/html-artifacts)
+  Prompt: "Compare three ways to do SSE streaming in a Hono backend"
+  Single self-contained file. No build step, no network at view time.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -13,8 +18,9 @@
   --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; }
+  :root:not([data-theme="light"]) { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; }
 }
+:root[data-theme="dark"] { --bg:#0e0e12; --surface:#16161c; --ink:#f1f1f4; --ink-soft:#a8a8b3; --rule:#2a2a32; }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--ink); margin: 0; }
 body { font: 17px/1.55 var(--serif); }
@@ -23,9 +29,9 @@ header.top { margin-bottom: 3rem; }
 header.top h1 { font-size: 2.2rem; line-height: 1.15; letter-spacing: -.01em; margin: 0 0 .4em; }
 header.top .crumb { color: var(--ink-soft); font: 13px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1em; }
 header.top .prompt { color: var(--ink-soft); font-style: italic; border-left: 3px solid var(--accent); padding-left: 1em; margin: 1em 0 0; }
-.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
 @media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
-article.option { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1.5rem; }
+article.option { min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 1.5rem; }
 article.option .num { font: 600 13px/1 var(--sans); color: var(--ink-soft); letter-spacing: .08em; }
 article.option h2 { font-size: 1.25rem; margin: .3em 0 .6em; line-height: 1.2; }
 article.option .desc { color: var(--ink-soft); font-size: .95rem; margin-bottom: 1.2em; }
@@ -43,6 +49,7 @@ footer.recommend { margin-top: 3rem; background: var(--surface); border: 1px sol
 footer.recommend h2 { margin: 0 0 .5em; font-size: 1.4rem; }
 footer.recommend p { margin: .6em 0; }
 footer.recommend strong { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent, #8b5cf6); outline-offset: 2px; }
 </style>
 </head>
 <body>

@@ -1,0 +1,42 @@
+# Behavioural evals. Each run makes real model calls against the repo's ANTHROPIC_API_KEY secret,
+# so this is manual (workflow_dispatch) rather than on every push. See evals/README.md.
+name: Evals
+
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case glob (default: all)"
+        default: "*"
+      runs:
+        description: "Runs per arm"
+        default: "3"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @anthropic-ai/claude-code
+      - name: Run plugin evals
+        run: |
+          claude plugin eval . \
+            --trust-plugin \
+            --allow-tools Write \
+            --case "${{ inputs.cases }}" \
+            --runs "${{ inputs.runs }}" \
+            --json results.json \
+            --threshold 0.8 \
+            --model claude-sonnet-5 \
+            --judge-model claude-haiku-4-5 \
+            --no-publish \
+            --max-cost-usd 20
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: |
+            results.json
+            evals/results/

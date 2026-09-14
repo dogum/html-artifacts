@@ -1,0 +1,36 @@
+name: Gallery submission
+description: Share an artifact you made with the skill. Good ones get linked from the site.
+title: "[gallery] "
+labels: ["gallery"]
+body:
+  - type: input
+    id: prompt
+    attributes:
+      label: The prompt
+      description: What you asked for, as close to verbatim as you're comfortable sharing.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: [Comparison or plan, Code review or PR, Design or prototype, Diagram, Data or dashboard, Report or explainer, Deck, Custom editor, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where you ran it
+      options: [Claude Code, Claude.ai chat, Cowork, Cloud session, Other]
+  - type: textarea
+    id: link
+    attributes:
+      label: The artifact
+      description: A link (a published artifact, a gist, a Pages site) or drag the .html file here. A screenshot helps too.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything the skill got wrong or you had to fix by hand?
+      description: This is the most useful part. It feeds the references and the evals.
