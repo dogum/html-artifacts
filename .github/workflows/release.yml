@@ -3,6 +3,11 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (e.g. v2.0.0)"
+        required: true
 
 permissions:
   contents: write
@@ -10,24 +15,31 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Check tag matches plugin version
         run: |
           v=$(python3 -c 'import json;print(json.load(open(".claude-plugin/plugin.json"))["version"])')
-          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "tag ${GITHUB_REF_NAME} != plugin.json v$v"; exit 1; }
+          [ "v$v" = "$TAG" ] || { echo "tag $TAG != plugin.json v$v"; exit 1; }
 
       - name: Build the Claude.ai skill zip
         run: scripts/build-skill.sh dist/html-artifacts.skill
 
       - name: Extract release notes from CHANGELOG
         run: |
-          v="${GITHUB_REF_NAME#v}"
-          awk -v v="$v" '/^## /{p = index($0, "[" v "]") > 0 || index($0, " " v " ") > 0 || $0 ~ ("^## " v "( |$)")} p' CHANGELOG.md > notes.md
+          v="${TAG#v}"
+          awk -v v="$v" '/^## /{p = index($0, "[" v "]") > 0} p' CHANGELOG.md > notes.md
           [ -s notes.md ] || echo "See CHANGELOG.md." > notes.md
+          cat notes.md
 
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.TAG }}
           body_path: notes.md
           files: dist/html-artifacts.skill
