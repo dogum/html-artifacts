@@ -20,6 +20,8 @@ if awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1{print}' "$src/SKIL
 fi
 
 mkdir -p "$(dirname "$out")"
+# Absolute, because we cd into the staging dir before zipping.
+out="$(cd "$(dirname "$out")" && pwd)/$(basename "$out")"
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/html-artifacts"
