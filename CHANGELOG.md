@@ -32,9 +32,9 @@ The skill was written for models that needed to be told how to write HTML. Four 
 - The committed `html-artifacts.skill` zip. It is now a release asset built by CI, so it cannot drift from `skills/`.
 - Leftover copy from the source article ("Greg or anyone else may open it on a phone") and a hardcoded path to a `frontend-design` skill.
 
-## [1.0.0] - 2026-05-08
+## [0.1.0] - 2026-05-08
 
 Initial release: `SKILL.md` with the recognition heuristic and universal rules, eight per-category references, six examples, and the GitHub Pages site.
 
-[2.0.0]: https://github.com/dogum/html-artifacts/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/dogum/html-artifacts/releases/tag/v1.0.0
+[2.0.0]: https://github.com/dogum/html-artifacts/compare/v0.1.0...v2.0.0
+[0.1.0]: https://github.com/dogum/html-artifacts/releases/tag/v0.1.0
