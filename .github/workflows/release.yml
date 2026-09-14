@@ -1,13 +1,13 @@
 name: Release
 
+# Two ways to release:
+#   1. Push a tag vX.Y.Z (must match plugin.json version).
+#   2. Run this workflow manually against a branch or commit. It reads the version
+#      from plugin.json and creates the tag vX.Y.Z on that commit as part of the release.
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Existing tag to release (e.g. v2.0.0)"
-        required: true
 
 permissions:
   contents: write
@@ -15,31 +15,33 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.tag || github.ref }}
 
-      - name: Check tag matches plugin version
+      - name: Resolve version and tag
+        id: v
         run: |
           v=$(python3 -c 'import json;print(json.load(open(".claude-plugin/plugin.json"))["version"])')
-          [ "v$v" = "$TAG" ] || { echo "tag $TAG != plugin.json v$v"; exit 1; }
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "tag ${GITHUB_REF_NAME} != plugin.json v$v"; exit 1; }
+          fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "tag=v$v" >> "$GITHUB_OUTPUT"
+          echo "releasing v$v at ${GITHUB_SHA}"
 
       - name: Build the Claude.ai skill zip
         run: scripts/build-skill.sh dist/html-artifacts.skill
 
       - name: Extract release notes from CHANGELOG
         run: |
-          v="${TAG#v}"
-          awk -v v="$v" '/^## /{p = index($0, "[" v "]") > 0} p' CHANGELOG.md > notes.md
+          awk -v v="${{ steps.v.outputs.version }}" '/^## /{p = index($0, "[" v "]") > 0} p' CHANGELOG.md > notes.md
           [ -s notes.md ] || echo "See CHANGELOG.md." > notes.md
           cat notes.md
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
-          name: ${{ env.TAG }}
+          tag_name: ${{ steps.v.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.v.outputs.tag }}
           body_path: notes.md
           files: dist/html-artifacts.skill
