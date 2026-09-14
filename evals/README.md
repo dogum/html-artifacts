@@ -15,10 +15,10 @@ From the repo root (Claude Code v2.1.269 or later; runs bill to your account):
 claude plugin eval . --allow-tools Write
 ```
 
-Iterate on one case cheaply:
+Iterate on one case cheaply (`--case` matches the case directory name, not its path):
 
 ```bash
-claude plugin eval . --allow-tools Write --case "should-not-trigger/*" --runs 1 --ablation none
+claude plugin eval . --allow-tools Write --case "code-only-request" --runs 1 --ablation none
 ```
 
 `--allow-tools Write` is required: runs never prompt for permissions, and the should-trigger cases need to write a file.
