@@ -124,6 +124,8 @@ Each is a single `.html` file produced by the skill from the prompt shown. View 
 | Design-token sheet | "Lay out our design tokens as a reference page" | [`08-design-tokens.html`](docs/examples/08-design-tokens.html) |
 | Incident post-mortem | "Write up yesterday's search latency outage as a post-mortem" | [`09-postmortem.html`](docs/examples/09-postmortem.html) |
 
+- Before/after on a shared fixture (Vibe Rooster): [before](https://skill-fixture-before.theroost.dev?vr_gallery=1) · [after, styled with this skill only](https://html-artifacts-after.theroost.dev?vr_gallery=1)
+
 Made something with the skill you're proud of? [Open a gallery issue](https://github.com/dogum/html-artifacts/issues/new?template=gallery.yml).
 
 ## Contributing
