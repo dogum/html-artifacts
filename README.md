@@ -8,6 +8,8 @@ A Claude skill for producing self-contained HTML artifacts instead of markdown w
 
 This skill operationalizes the recognition heuristic and per-category patterns from Thariq's post. It triggers on requests where HTML lands harder than markdown (comparisons, plans, code reviews, explainers, post-mortems, dashboards, custom editors) and stays out of the way for everything else.
 
+Made by the builder of [Cairn](https://getcairn.dev) and [PlowPath](https://plowpath.dev).
+
 **[→ See the live examples](https://dogum.github.io/html-artifacts/)** · **[Changelog](CHANGELOG.md)** · **[Latest release](https://github.com/dogum/html-artifacts/releases/latest)**
 
 ## What's new in 2.0
